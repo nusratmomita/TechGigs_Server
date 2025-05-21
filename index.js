@@ -30,12 +30,18 @@ async function run() {
 
     const tasksCollection = client.db('TechGigs').collection('tasks');
 
+    // for creating tasks
     app.post('/tasks', async(req,res)=>{
       const addTasksData = req.body;
       const result = await tasksCollection.insertOne(addTasksData);
       res.send(result);
     })
 
+    // for showing all the tasks
+    app.get('/tasks', async(req,res)=>{
+      const result = await tasksCollection.find().toArray();
+      res.send(result)
+    })
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } 
