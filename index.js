@@ -46,10 +46,21 @@ async function run() {
     // for showing individual task details
     app.get('/tasks/:id', async(req,res)=>{
       const id = req.params.id;
-      const query = {_id : new ObjectId(id)};
+      const query = { _id : new ObjectId(id) };
       const result = await tasksCollection.findOne(query);
       res.send(result);
     })
+
+    // for showing logged in users tasks only
+    app.get('/tasks/specific/:email' , async(req,res)=>{
+      const email = req.params.email;
+      const query = { email : email } ;
+      // console.log(query)
+
+      const result = await tasksCollection.find(query).toArray();
+      res.send(result);
+    })
+
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } 
