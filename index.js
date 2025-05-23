@@ -6,10 +6,6 @@ const port = process.env.PORT || 3000
 
 const app = express();
 
-// TechGigs
-// VgpJJmMHcoPMP0jZ
-
-
 app.use(cors());
 app.use(express.json());
 
@@ -26,7 +22,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
 
     const tasksCollection = client.db('TechGigs').collection('tasks');
 
@@ -61,8 +57,24 @@ async function run() {
       res.send(result);
     })
 
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // for updating tasks
+    // app.put('/tasks/update/:id', async(req,res)=>{
+    app.put('/tasks/:id', async(req,res)=>{
+      const id = req.params.id;
+      const filter = { _id : new ObjectId(id)};
+      
+      const options = { upset: true };
+      const updatedTask = req.body;
+      const updatedDoc = {
+        $set: updatedTask
+      };
+
+      const result = await tasksCollection.updateOne(filter , updatedDoc , options);
+      res.send(result);
+    })
+
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } 
   finally {
   }
