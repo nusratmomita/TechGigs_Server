@@ -34,10 +34,20 @@ async function run() {
     })
 
     // for showing all the tasks
-    app.get('/tasks', async(req,res)=>{
+    app.get('/tasks/allTasks', async(req,res)=>{
       const result = await tasksCollection.find().toArray();
       res.send(result)
     })
+
+    // for showing features 6 tasks
+    app.get('/tasks', async (req, res) => {
+    const tasks = await tasksCollection.find()
+      .sort({ task_deadline: 1 })
+      .limit(6)
+      .toArray();
+    // const result = await tasksCollection.find().toArray();
+      res.send(tasks)
+    });
 
     // for showing individual task details
     app.get('/tasks/:id', async(req,res)=>{
@@ -72,6 +82,25 @@ async function run() {
       const result = await tasksCollection.updateOne(filter , updatedDoc , options);
       res.send(result);
     })
+
+    // for deleting tasks
+    app.delete('/tasks/:id' , async(req,res)=>{
+      const id = req.params.id;
+      const query = { _id : new ObjectId(id) };
+      const result = await tasksCollection.deleteOne(query);
+      res.send(result);
+    })
+
+    // for bid counts
+    app.patch('/tasks/bid/:id', async (req, res) => {
+    const id = req.params.id;
+    const filter = { _id: new ObjectId(id) };
+    const updateDoc = {
+      $inc: { total_bids: 1 }
+    };
+    const result = await tasksCollection.updateOne(filter, updateDoc);
+    res.send(result);
+    });
 
     // await client.db("admin").command({ ping: 1 });
     // console.log("Pinged your deployment. You successfully connected to MongoDB!");
